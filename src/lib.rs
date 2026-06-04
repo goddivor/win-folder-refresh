@@ -35,24 +35,35 @@ mod windows_impl {
     use windows::core::HSTRING;
     use windows::Win32::UI::Shell::{
         ILCreateFromPathW, ILFree, SHChangeNotify, SHCNE_UPDATEDIR, SHCNE_UPDATEITEM,
-        SHCNF_IDLIST, SHCNF_PATHW,
+        SHCNF_FLUSH, SHCNF_IDLIST, SHCNF_PATHW,
     };
 
     pub fn refresh(path: &str) -> bool {
         let wide = HSTRING::from(path);
         unsafe {
-            // Preferred: notify the exact item by its PIDL, like the shell does
-            // when an icon changes.
+            // SHCNF_FLUSH makes the shell process the notification right away
+            // instead of queueing/coalescing it.
+
+            // 1. Notify the exact item by its PIDL, like the shell does when an
+            //    icon changes.
             let pidl = ILCreateFromPathW(&wide);
             if !pidl.is_null() {
-                SHChangeNotify(SHCNE_UPDATEITEM, SHCNF_IDLIST, Some(pidl as _), None);
+                SHChangeNotify(SHCNE_UPDATEITEM, SHCNF_IDLIST | SHCNF_FLUSH, Some(pidl as _), None);
                 ILFree(Some(pidl));
             }
-            // Also nudge the directory by path, which helps some views pick the
-            // change up immediately.
+
+            // 2. Notify the item itself by path (a folder's own appearance).
+            SHChangeNotify(
+                SHCNE_UPDATEITEM,
+                SHCNF_PATHW | SHCNF_FLUSH,
+                Some(wide.as_ptr() as _),
+                None,
+            );
+
+            // 3. Nudge the directory too, which helps some views re-read it.
             SHChangeNotify(
                 SHCNE_UPDATEDIR,
-                SHCNF_PATHW,
+                SHCNF_PATHW | SHCNF_FLUSH,
                 Some(wide.as_ptr() as _),
                 None,
             );
