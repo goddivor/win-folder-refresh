@@ -34,7 +34,7 @@ pub fn refresh_folder(path: String) -> bool {
 mod windows_impl {
     use windows::core::HSTRING;
     use windows::Win32::UI::Shell::{
-        ILCreateFromPath, ILFree, SHChangeNotify, SHCNE_UPDATEDIR, SHCNE_UPDATEITEM,
+        ILCreateFromPathW, ILFree, SHChangeNotify, SHCNE_UPDATEDIR, SHCNE_UPDATEITEM,
         SHCNF_IDLIST, SHCNF_PATHW,
     };
 
@@ -43,7 +43,7 @@ mod windows_impl {
         unsafe {
             // Preferred: notify the exact item by its PIDL, like the shell does
             // when an icon changes.
-            let pidl = ILCreateFromPath(&wide);
+            let pidl = ILCreateFromPathW(&wide);
             if !pidl.is_null() {
                 SHChangeNotify(SHCNE_UPDATEITEM, SHCNF_IDLIST, Some(pidl as _), None);
                 ILFree(Some(pidl));
