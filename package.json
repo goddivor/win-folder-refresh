@@ -1,0 +1,51 @@
+{
+  "name": "win-folder-refresh",
+  "version": "0.1.0",
+  "description": "Refresh a Windows folder icon in Explorer via SHChangeNotify. Native N-API addon; no-op on non-Windows.",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "license": "MIT",
+  "author": "Divor",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goddivor/win-folder-refresh.git"
+  },
+  "keywords": [
+    "windows",
+    "explorer",
+    "folder",
+    "icon",
+    "refresh",
+    "shchangenotify",
+    "napi",
+    "native"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "os": [
+    "win32"
+  ],
+  "napi": {
+    "name": "win-folder-refresh",
+    "triples": {
+      "defaults": false,
+      "additional": [
+        "x86_64-pc-windows-msvc",
+        "aarch64-pc-windows-msvc"
+      ]
+    }
+  },
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
+  "scripts": {
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "test": "node test.js"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.4"
+  }
+}
